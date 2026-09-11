@@ -2,32 +2,17 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>{% block tytul %}Sklep{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Aplikacja Flask</title>
 </head>
 <body>
     <nav>
         <a href="{{ url_for('index') }}">Start</a> |
-        <a href="{{ url_for('produkty') }}">Lista produktów</a> |
-        <a href="{{ url_for('dodaj') }}">Dodaj nowy</a> |
+        <a href="{{ url_for('produkty') }}">Lista produktów</a>
     </nav>
-
-    <br>
-
-    <form action="{{ url_for('szukaj') }}" method="grt">
-        <input type="text" name="q" placeholder="Szukaj nzwy...">
-        <button type="submit">Szukaj</button>
-    </form>
-
     <hr>
 
     <main>
-        <hr>
-        <footer>
-            <p>Projekt Flask - 4TP 2026</p>
-        </footer>
+        {% block tresc %}{% endblock %}
     </main>
 </body>
 </html>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block tytul %}Strona Główna{% endblock %}
 
 {% block tresc %}
-<h1>Witamy w projekcie: {{ projekt }}</h1>
-<p>Autor projektu: {{ Rodion }}</p>
-{{% endblock %}}
+<h1>Strona Główna</h1>
+<p>Witaj w aplikacji!</p>
+<a href="{{ url_for('produkty') }}">Przejdź do listy produktów</a>
+{% endblock %}

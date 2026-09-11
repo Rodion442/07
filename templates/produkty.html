@@ -1,36 +1,21 @@
 {% extends "base.html" %}
 
-{% block tytul %}Lista Produktów{% endblock %}
-
 {% block tresc %}
-<h1>Lista Produktów</h1>
+<h1>Lista Produktów (Zadanie 2)</h1>
 
 {% if produkty %}
-    <table>
-        <tr>
-            <th>Lp.</th>
-            <th>Nazwa</th>
-            <th>Cena</th>
-            <th>Dostępność</th>
-        </tr>
-        {% for p in produkty %}
-        <tr {% if not p.dostepny %}class="niedostepny"{% endif %}>
-            <td>{{ loop.index }}</td>
-            <td>
-                <a href="{{ url_for('produkt', id=p.id) }}">{{ p.nazwa }}</a>
-            </td>
-            <td>{{ p.cena }} zł</td>
-            <td>
-                {% if p.dostepny %}
-                    Dostępny
-                {% else %}
-                    Brak
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <ul>
+    {% for p in produkty %}
+        <li>
+            <!-- Ссылка ведет на маршрут Zadania 3 z передачей p.id -->
+            <a href="{{ url_for('produkt', id=p.id) }}">
+                <b>{{ loop.index }}. {{ p.nazwa }}</b>
+            </a> 
+            — {{ p.cena }} zł
+        </li>
+    {% endfor %}
+    </ul>
 {% else %}
-    <p>Brak elementów do wyświetlenia.</p>
+    <p>Brak produktów w bazie.</p>
 {% endif %}
 {% endblock %}

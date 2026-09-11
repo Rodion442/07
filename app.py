@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, abort
+from flask import Flask, render_template, abort
 
 app = Flask(__name__)
 
-# --- Baza danych (lista słowników) ---
+# --- Baza danych (lista słowników) --- tym czsowa baza danych
 PRODUKTY = [
     {"id": 1, "nazwa": "Kort Centralny", "cena": 100.0, "dostepny": True},
     {"id": 2, "nazwa": "Kort 2 Trawa", "cena": 80.0, "dostepny": False},
@@ -10,70 +10,35 @@ PRODUKTY = [
 ]
 
 
-# --- Zadanie 1: Strona główna ---
+# --- Strona główna ---
 @app.route("/")
 def index():
-    nazwa_projektu = "System Rezerwacji Kortów"
-    autor = "Rodion"
-    return render_template("index.html", projekt=nazwa_projektu, imie=autor)
+    return render_template("index.html") #pobieera plik HTML z folderu templates i uzupewnia go danymi z pythona
 
 
-# --- Zadanie 2, 5: Lista produktów ---
+# --- ZADANIE 2: Lista produktów ---
 @app.route("/produkty")
 def produkty():
+    # Передаем весь список PRODUKTY в шаблон produkty.html
     return render_template("produkty.html", produkty=PRODUKTY)
 
 
-# --- Zadanie 3: Szczegóły elementu ---
+# --- ZADANIE 3: Szczegóły elementu (ID) ---
 @app.route("/produkt/<int:id>")
 def produkt(id):
     znaleziony_produkt = None
     
-    for p in PRODUKTY:
-        if p["id"] == id:
-            znaleziony_produkt = p
+    # Ищем продукт с нужным ID простым циклом for
+    for p in PRODUKTY: # pętla przecodzi pokoleji przez każdy słownik
+        if p["id"] == id: # sprawdza czy id zgadza sie z podanym w adresem URL
+            znaleziony_produkt = p # jeśli zgadza sie id to zapisujemy cały słowik tego produktu do zmoennej
 
+    # Если продукт с таким ID не найден — выдаем ошибку 404
     if znaleziony_produkt is None:
         abort(404)
 
+    # Передаем найденный элемент в шаблон szczegoly.html
     return render_template("szczegoly.html", produkt=znaleziony_produkt)
-
-
-# --- Zadanie 6: Wyszukiwarka (GET) ---
-@app.route("/szukaj")
-def szukaj():
-    zapytanie = request.args.get("q", "")
-    
-    wyniki = []
-    zapytanie_low = zapytanie.lower()
-
-    for p in PRODUKTY:
-        nazwa_low = p["nazwa"].lower()
-        if zapytanie_low in nazwa_low:
-            wyniki.append(p)
-
-    return render_template("szukaj.html", q=zapytanie, wyniki=wyniki)
-
-
-# --- Zadanie 7: Dodawanie elementu (POST) ---
-@app.route("/dodaj", methods=["GET", "POST"])
-def dodaj():
-    if request.method == "POST":
-        nowe_id = len(PRODUKTY) + 1
-        nowa_nazwa = request.form["nazwa"]
-        nowa_cena = float(request.form["cena"])
-        
-        nowy_element = {
-            "id": nowe_id,
-            "nazwa": nowa_nazwa,
-            "cena": nowa_cena,
-            "dostepny": True
-        }
-        
-        PRODUKTY.append(nowy_element)
-        return redirect(url_for("produkty"))
-
-    return render_template("dodaj.html")
 
 
 if __name__ == "__main__":
