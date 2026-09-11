@@ -1,134 +1,80 @@
-# Импортируем сам Flask и необходимые вспомогательные инструменты из библиотеки
-from flask import Flask, request, url_for, redirect, abort
+from flask import Flask, render_template, request, redirect, url_for, abort
 
-# Создаём главный экземпляр веб-приложения Flask
 app = Flask(__name__)
 
-# --- Zadanie 1: Powitanie ---
-# Объявляем маршрут с динамическим текстовым параметром 'imie' в URL
-@app.route("/czesc/<imie>")
-def czesc(imie): # Функция принимает имя, автоматически вытащенное из URL
-    return f"Cześć, {imie}!" # Возвращаем приветственную строку с подставленным именем
+# --- Baza danych (lista słowników) ---
+PRODUKTY = [
+    {"id": 1, "nazwa": "Kort Centralny", "cena": 100.0, "dostepny": True},
+    {"id": 2, "nazwa": "Kort 2 Trawa", "cena": 80.0, "dostepny": False},
+    {"id": 3, "nazwa": "Kort 3 Hard Court", "cena": 90.0, "dostepny": True},
+]
 
 
-# Маршрут с двумя параметрами: имя (текст) и возраст (только целое число)
-@app.route("/czesc/<imie>/<int:wiek>")
-def czesc_wiek(imie, wiek): # Функция принимает параметры 'imie' и 'wiek'
-    # Возвращаем приветствие с именем и возрастом
-    return f"Cześć, {imie}, masz {wiek} lat."
+# --- Zadanie 1: Strona główna ---
+@app.route("/")
+def index():
+    nazwa_projektu = "System Rezerwacji Kortów"
+    autor = "Rodion"
+    return render_template("index.html", projekt=nazwa_projektu, imie=autor)
 
 
-# --- Zadanie 2: Kalkulator ---
-# Маршрут для сложения двух целых чисел 'a' и 'b'
-@app.route("/dodaj/<int:a>/<int:b>")
-def dodaj(a, b): # Функция принимает слагаемые a и b
-    return f"{a} + {b} = {a + b}" # Вычисляем сумму и возвращаем результат в виде строки
+# --- Zadanie 2, 5: Lista produktów ---
+@app.route("/produkty")
+def produkty():
+    return render_template("produkty.html", produkty=PRODUKTY)
 
 
-# Маршрут для вычитания двух целых чисел 'a' и 'b'
-@app.route("/odejmij/<int:a>/<int:b>")
-def odejmij(a, b): # Функция принимает уменьшаемое a и вычитаемое b
-    return f"{a} - {b} = {a - b}" # Возвращаем результат вычитания
+# --- Zadanie 3: Szczegóły elementu ---
+@app.route("/produkt/<int:id>")
+def produkt(id):
+    znaleziony_produkt = None
+    
+    for p in PRODUKTY:
+        if p["id"] == id:
+            znaleziony_produkt = p
+
+    if znaleziony_produkt is None:
+        abort(404)
+
+    return render_template("szczegoly.html", produkt=znaleziony_produkt)
 
 
-# Маршрут для умножения двух целых чисел 'a' и 'b'
-@app.route("/pomnoz/<int:a>/<int:b>")
-def pomnoz(a, b): # Функция принимает множители a и b
-    return f"{a} * {b} = {a * b}" # Возвращаем результат умножения
+# --- Zadanie 6: Wyszukiwarka (GET) ---
+@app.route("/szukaj")
+def szukaj():
+    zapytanie = request.args.get("q", "")
+    
+    wyniki = []
+    zapytanie_low = zapytanie.lower()
+
+    for p in PRODUKTY:
+        nazwa_low = p["nazwa"].lower()
+        if zapytanie_low in nazwa_low:
+            wyniki.append(p)
+
+    return render_template("szukaj.html", q=zapytanie, wyniki=wyniki)
 
 
-# Маршрут для деления двух целых чисел 'a' и 'b'
-@app.route("/podziel/<int:a>/<int:b>")
-def podziel(a, b): # Функция принимает делимое a и делитель b
-    if b == 0: # Проверяем, не равен ли делитель нулю
-        # Если ноль, возвращаем текст ошибки и HTTP-статус 400 Bad Request
-        return "Nie dzielimy przez zero", 400
-    return f"{a} / {b} = {a / b}" # Если не ноль, выполняем деление и возвращаем ответ
+# --- Zadanie 7: Dodawanie elementu (POST) ---
+@app.route("/dodaj", methods=["GET", "POST"])
+def dodaj():
+    if request.method == "POST":
+        nowe_id = len(PRODUKTY) + 1
+        nowa_nazwa = request.form["nazwa"]
+        nowa_cena = float(request.form["cena"])
+        
+        nowy_element = {
+            "id": nowe_id,
+            "nazwa": nowa_nazwa,
+            "cena": nowa_cena,
+            "dostepny": True
+        }
+        
+        PRODUKTY.append(nowy_element)
+        return redirect(url_for("produkty"))
+
+    return render_template("dodaj.html")
 
 
-# Маршрут для возведения числа 'a' в степень 'b'
-@app.route("/potega/<int:a>/<int:b>")
-def potega(a, b): # Функция принимает основание 'a' и показатель 'b'
-    return f"{a} ^ {b} = {a ** b}" # Возводим в степень оператором '**' и возвращаем результат
-
-
-# --- Zadanie 3: Tabliczka mnożenia ---
-# Маршрут для таблицы умножения числа 'n'
-@app.route("/tabliczka/<int:n>")
-def tabliczka(n): # Функция принимает число n
-    if n < 1 or n > 20: # Проверяем валидацию: число должно быть в отрезке 1–20
-        # Возвращаем сообщение об ошибке и HTTP-статус 400
-        return "Liczba n musi быть в предziale 1-20", 400
-
-    wynik = [] # Создаём пустой список для строк таблицы умножения
-    for i in range(1, 11): # Запускаем цикл от 1 до 10 включительно
-        # Добавляем в список сформированный пример (например, "5 x 1 = 5")
-        wynik.append(f"{n} x {i} = {n * i}")
-
-    # Склеиваем элементы списка в один текст, разделяя их HTML-тегом <br> (перенос строки)
-    return "<br>".join(wynik)
-
-
-# --- Zadanie 4: Query string ---
-@app.route("/produkty") # Маршрут без внутренних параметров в пути URL
-def produkty(): # Функция обработчика
-    # Извлекаем параметр 'kat' из URL (?kat=...); если его нет, ставим "wszystkie"
-    kat = request.args.get("kat", "wszystkie")
-    # Извлекаем параметр 'sort' из URL (?sort=...); если его нет, ставим "domyślne"
-    sort = request.args.get("sort", "domyślne")
-    # Возвращаем строку с полученными значениями параметров
-    return f"Kategoria: {kat}, sortowanie: {sort}"
-
-
-# --- Zadanie 5: Mini-baza w słowniku (Korty tenisowe / Rezerwacje) ---
-KORTY = { # Создаём словарь, выполняющий роль временной базы данных
-    1: "Kort Centralny (Nawierzchnia ceglana)",
-    2: "Kort 2 (Trawa)",
-    3: "Kort 3 (Hard court)",
-    4: "Kort Kryty A (Hala)",
-    5: "Kort Kryty B (Hala)",
-}
-
-
-# Маршрут для поиска одного элемента по его числовому ID
-@app.route("/element/<int:id>")
-def element(id): # Функция принимает ID из адреса
-    if id not in KORTY: # Проверяем, есть ли такой ключ (id) в словаре KORTY
-        abort(404) # Если ключа нет, вызываем ошибку 404 Not Found
-    return f"Kort: {KORTY[id]}" # Если есть, возвращаем название элемента по ID
-
-
-@app.route("/elementy") # Маршрут для получения всех элементов базы
-def elementy(): # Функция без параметров
-    lista = [] # Создаем пустой список
-    for id, nazwa in KORTY.items(): # Проходим циклом по всем элементам словаря KORTY
-        lista.append(f"{id}: {nazwa}") # Добавляем каждую отформатированную строку в список
-    return "<br>".join(lista) # Соединяем элементы тегом <br> для вывода в браузере
-
-
-# --- Zadanie 6: Przekierowanie ---
-@app.route("/") # Маршрут для главной страницы приложения
-def index(): # Функция главной страницы
-    return "Strona główna serwisu" # Возвращаем простой текст главной страницы
-
-
-@app.route("/start") # Маршрут для перенаправления
-def start(): # Функция, вызываемая по адресу /start
-    # Генерируем URL для функции index() и перенаправляем пользователя (HTTP 302)
-    return redirect(url_for("index"))
-
-
-# Проверяем, запущен ли данный файл напрямую
 if __name__ == "__main__":
-    # Запускаем локальный веб-сервер с включённым режимом отладки (debug mode)
     app.run(debug=True)
-
-
-# ==============================================================================
-# КРАТКОЕ ОБЪЯСНЕНИЕ КЛЮЧЕВЫХ КОНЦЕПЦИЙ В КОДЕ:
-# ==============================================================================
-# 1. f-строки (f"...") — позволяют вставлять переменные и выражения прямо в текст
-# через фигурные скобки {переменная}. Это чище и удобнее склейки через "+".
-# 2. request.args.get(...) — достаёт параметры из Query String (после знака '?').
-# ==============================================================================
-# {} - słownik, [] - lista

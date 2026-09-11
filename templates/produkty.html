@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block tytul %}Lista Produktów{% endblock %}
+
+{% block tresc %}
+<h1>Lista Produktów</h1>
+
+{% if produkty %}
+    <table>
+        <tr>
+            <th>Lp.</th>
+            <th>Nazwa</th>
+            <th>Cena</th>
+            <th>Dostępność</th>
+        </tr>
+        {% for p in produkty %}
+        <tr {% if not p.dostepny %}class="niedostepny"{% endif %}>
+            <td>{{ loop.index }}</td>
+            <td>
+                <a href="{{ url_for('produkt', id=p.id) }}">{{ p.nazwa }}</a>
+            </td>
+            <td>{{ p.cena }} zł</td>
+            <td>
+                {% if p.dostepny %}
+                    Dostępny
+                {% else %}
+                    Brak
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>Brak elementów do wyświetlenia.</p>
+{% endif %}
+{% endblock %}

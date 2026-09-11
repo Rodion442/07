@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block tytul %}Wyniki Wyszukiwania{% endblock %}
+
+{% block tresc %}
+<h1>Wyniki wyszukiwania dla: "{{ q }}"</h1>
+
+{% if wyniki %}
+    <p>Znaleziono elementów: {{ wyniki|length }}</p>
+    <ul>
+    {% for p in wyniki %}
+        <li>
+            <a href="{{ url_for('produkt', id=p.id) }}">{{ p.nazwa }}</a> — {{ p.cena }} zł
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Brak wyników dla podanej frazy.</p>
+{% endif %}
+{% endblock %}

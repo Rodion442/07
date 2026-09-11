@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block tytul %}Szczegóły Produktu{% endblock %}
+
+{% block tresc %}
+<h1>Szczegóły: {{ produkt.nazwa }}</h1>
+<p><b>ID:</b> {{ produkt.id }}</p>
+<p><b>Cena:</b> {{ produkt.cena }} zł</p>
+<p><b>Status:</b> 
+    {% if produkt.dostepny %}
+        Dostępny
+    {% else %}
+        Niedostępny
+    {% endif %}
+</p>
+
+<a href="{{ url_for('produkty') }}">Powrót do listy</a>
+{% endblock %}
