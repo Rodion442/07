@@ -1,33 +1,36 @@
 {% extends "base.html" %}
 
 {% block tresc %}
-<h1>Lista Produktów (Zadanie 2-5)</h1>
+<h1>Lista Produktów</h1>
 
-<!-- ZADANIE 5: Formularz dodawania nowego produktu -->
-<h2>Dodaj nowy produkt</h2>
+<!-- ZADANIE 6: Formularz wyszukiwania / filtrowania -->
+<h2>Filtrowanie (Zadanie 6)</h2>
+<form action="{{ url_for('produkty') }}" method="get">
+    <input type="text" name="szukaj" value="{{ szukaj }}" placeholder="Szukaj po nazwie...">
+    <button type="submit">Szukaj</button>
+    <a href="{{ url_for('produkty') }}">Wyczyść</a>
+</form>
 
-<!-- Formularz wysyła dane metodą POST na adres /produkty -->
+<hr>
+
+<h2>Dodaj nowy produkt (Zadanie 5)</h2>
 <form action="{{ url_for('produkty') }}" method="post">
     <div>
         <label for="nazwa">Nazwa:</label><br>
-        <!-- name="nazwa" jest kluczowe dla request.form.get('nazwa') w Pythonie -->
         <input type="text" id="nazwa" name="nazwa" required>
     </div>
     <br>
     <div>
         <label for="cena">Cena (zł):</label><br>
-        <!-- step="0.01" pozwala wpisywać grosze/ułamki -->
         <input type="number" step="0.01" id="cena" name="cena" required>
     </div>
     <br>
     <div>
         <label>
-            <!-- Checkbox wysyła wartość 'on' gdy jest zaznaczony -->
             <input type="checkbox" name="dostepny" checked> Dostępny
         </label>
     </div>
     <br>
-    <!-- Przycisk do wysłania formularza -->
     <button type="submit">Dodaj produkt</button>
 </form>
 
@@ -37,7 +40,6 @@
 {% if produkty %}
     <ul>
     {% for p in produkty %}
-        <!-- Warunek w klasie CSS podświetla niedostępne produkty -->
         <li {% if not p.dostepny %}class="niedostepny"{% endif %}>
             <a href="{{ url_for('produkt', id=p.id) }}">
                 <b>{{ loop.index }}. {{ p.nazwa }}</b>
@@ -46,10 +48,18 @@
             {% if not p.dostepny %}
                 <b>(Niedostępny)</b>
             {% endif %}
+
+            <!-- ZADANIE 7: Przycisk usuwania elementu -->
+            <form action="{{ url_for('usun_produkt', id=p.id) }}" method="post" style="display:inline;">
+                <button type="submit" onclick="return confirm('Czy na pewno chcesz usunąć?')">Usuń</button>
+            </form>
+            
+            <!-- ZADANIE 8: Link do edycji -->
+            <a href="{{ url_for('edytuj_produkt', id=p.id) }}">Edytuj</a>
         </li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>Brak produktów w bazie.</p>
+    <p>Brak wyników do wyświetlenia.</p>
 {% endif %}
 {% endblock %}
