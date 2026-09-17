@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block tresc %}
+<h1>Edycja Produktu (Zadanie 8)</h1>
+
+<form action="{{ url_for('edytuj_produkt', id=produkt.id) }}" method="post">
+    <div>
+        <label for="nazwa">Nazwa:</label><br>
+        <input type="text" id="nazwa" name="nazwa" value="{{ produkt.nazwa }}" required>
+    </div>
+    <br>
+    <div>
+        <label for="cena">Cena (zł):</label><br>
+        <input type="number" step="0.01" id="cena" name="cena" value="{{ produkt.cena }}" required>
+    </div>
+    <br>
+    <div>
+        <label>
+            <input type="checkbox" name="dostepny" {% if produkt.dostepny %}checked{% endif %}> Dostępny
+        </label>
+    </div>
+    <br>
+    <button type="submit">Zapisz zmiany</button>
+</form>
+
+<br>
+<a href="{{ url_for('produkt', id=produkt.id) }}">Anuluj</a>
+{% endblock %}
