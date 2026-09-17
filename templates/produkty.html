@@ -1,17 +1,20 @@
 {% extends "base.html" %}
 
 {% block tresc %}
-<h1>Lista Produktów (Zadanie 2)</h1>
+<h1>Lista Produktów (Zadanie 2, 3, 4)</h1>
 
 {% if produkty %}
     <ul>
     {% for p in produkty %}
-        <li>
-            <!-- Ссылка ведет на маршрут Zadania 3 z передачей p.id -->
+        <!-- Если p.dostepny == False, добавляем CSS-класс 'niedostepny' -->
+        <li {% if not p.dostepny %}class="niedostepny"{% endif %}>
             <a href="{{ url_for('produkt', id=p.id) }}">
                 <b>{{ loop.index }}. {{ p.nazwa }}</b>
             </a> 
-            — {{ p.cena }} zł
+            — {{ p.cena }} zł 
+            {% if not p.dostepny %}
+                <b>(Niedostępny)</b>
+            {% endif %}
         </li>
     {% endfor %}
     </ul>

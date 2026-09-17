@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 10 px;
+}
+ nav a {
+    margin-right: 10px;
+ }
+
+ ul {
+    list-style-type: none;
+    padding: 0;
+ }
+
+ li {
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+ }
+
+ /* czerwony fon*/
+ .niedostepny {
+    background-color: #ffe6e6;
+    color: #d9534f;
+ }
